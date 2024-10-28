@@ -17,5 +17,3 @@ spec:
         image: 654654474502.dkr.ecr.us-east-1.amazonaws.com/html-app:latest
         ports:
         - containerPort: 80
-        - port: 80
-        - targetport: 80
