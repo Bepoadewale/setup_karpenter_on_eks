@@ -1,1 +1,1 @@
-Deploy a html website on AWS EKS.
+Deploy html website on AWS EKS.
