@@ -62,5 +62,6 @@ jobs:
     # Step 9: Set Up Monitoring with Prometheus and Grafana
     - name: Deploy Monitoring Tools
       run: |
+        kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/bundle.yaml
         kubectl apply -f k8s/prometheus.yml
         kubectl apply -f k8s/grafana.yml
