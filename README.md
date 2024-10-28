@@ -1,1 +1,1 @@
-# Html-On-AWS-EKS
+Deploy html website on AWS EKS.
