@@ -1,0 +1,10 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: html-app-monitor
+spec:
+  selector:
+    matchLabels:
+      app: html-app
+  endpoints:
+    - port: web
