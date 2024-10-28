@@ -6,5 +6,6 @@ spec:
   type: LoadBalancer
   ports:
     - port: 80
+    - targetport: 80
   selector:
     app: html-app
