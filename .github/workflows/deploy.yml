@@ -22,33 +22,33 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
-    # Step 6: Build Docker Image
+    # Step 3: Build Docker Image
     - name: Build Docker Image
       run: |
         docker build -t html-app:latest .
         docker tag html-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/html-app:latest
 
-    # Step 7: Push Docker Image to Amazon ECR
+    # Step 4: Push Docker Image to Amazon ECR
     - name: Push Docker Image to ECR
       run: |
         aws ecr create-repository --repository-name html-app --region us-east-1
         aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
         docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/html-app:latest
     
-    # Step 3: Install Terraform
+    # Step 5: Install Terraform
     - name: Install Terraform
       uses: hashicorp/setup-terraform@v1
       with:
         terraform_version: 1.1.0
 
-    # Step 4: Terraform Init & Apply (Provision EKS)
+    # Step 6: Terraform Init & Apply (Provision EKS)
     - name: Terraform Init & Apply
       working-directory: ./terraform
       run: |
         terraform init
         terraform apply -auto-approve
 
-    # Step 5: Set Up kubectl for EKS
+    # Step 7: Set Up kubectl for EKS
     - name: Set up kubectl
       run: |
         aws eks --region us-east-1 update-kubeconfig --name my-eks-cluster
@@ -58,12 +58,3 @@ jobs:
       run: |
         kubectl apply -f k8s/deployment.yml
         kubectl apply -f k8s/service.yml
-
-    # Step 9: Set Up Monitoring with Prometheus and Grafana
-    - name: Deploy Monitoring Tools
-      run: |
-        helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-        helm repo update
-        helm install prometheus-operator prometheus-community/kube-prometheus-stack
-        kubectl apply -f k8s/prometheus.yml
-        kubectl apply -f k8s/grafana.yml
