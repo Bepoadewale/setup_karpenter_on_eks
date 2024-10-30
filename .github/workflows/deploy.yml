@@ -58,3 +58,4 @@ jobs:
       run: |
         kubectl apply -f k8s/deployment.yml
         kubectl apply -f k8s/service.yml
+        aws eks --region us-east-1 update-kubeconfig --name my-eks-cluster
