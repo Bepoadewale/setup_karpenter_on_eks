@@ -146,11 +146,6 @@ resource "aws_eks_node_group" "my_node_group" {
 
   instance_types = ["t3.medium"]
 
-  remote_access {
-    ec2_ssh_key = "windows-demo"
-    source_security_group_ids = [aws_security_group.eks_node_sg.id]
-  }
-
   tags = {
     Name = "my-node-group"
   }
