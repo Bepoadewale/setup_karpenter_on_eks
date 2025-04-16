@@ -3,5 +3,7 @@ terraform {
     bucket         = "eks-deploy-html-website-aws-autoscaling-group"
     key            = "html-app/terraform.tfstate"
     region         = "us-east-1"
+    encrypt        = true
+    use_lockfile   = true 
   }
 }

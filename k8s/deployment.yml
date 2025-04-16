@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: html-app
-        image: 654654474502.dkr.ecr.us-east-1.amazonaws.com/html-app:latest
+        image: 328357844669.dkr.ecr.us-east-1.amazonaws.com/html-app:latest
         ports:
         - containerPort: 80
