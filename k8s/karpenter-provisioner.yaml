@@ -1,0 +1,24 @@
+# k8s/karpenter-provisioner.yaml
+
+apiVersion: karpenter.sh/v1alpha5
+kind: Provisioner
+metadata:
+  name: default
+spec:
+  requirements:
+    - key: "karpenter.sh/capacity-type"
+      operator: In
+      values: ["spot", "on-demand"]
+    - key: "node.kubernetes.io/instance-type"
+      operator: In
+      values: ["t3.medium", "t3.large", "t3a.medium", "t3a.large"]
+  limits:
+    resources:
+      cpu: "1000"
+  provider:
+    instanceProfile: KarpenterNodeInstanceProfile
+    subnetSelector:
+      Name: "eks-subnet-0" # Adjust according to your subnet tag
+    securityGroupSelector:
+      Name: "eks-node-sg"  # Adjust according to your SG tag
+  ttlSecondsAfterEmpty: 30
