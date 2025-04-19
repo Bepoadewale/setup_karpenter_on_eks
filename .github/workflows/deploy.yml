@@ -72,7 +72,7 @@ jobs:
           echo "S3 bucket $BUCKET_NAME already exists"
         fi
 
-    # Step 7: Create DynamoDB Lock Table (If Not Exists)
+    # Step 7: Create DynamoDB lock Table (If Not Exists)
     - name: Create DynamoDB Lock Table (If Not Exists)
       run: |
         TABLE_NAME="terraform-locks"
