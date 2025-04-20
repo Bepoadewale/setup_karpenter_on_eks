@@ -22,13 +22,13 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
-    # Step 3: Build Docker image
+    # Step 3: Build Docker Image
     - name: Build Docker Image
       run: |
         docker build -t html-app:latest .
         docker tag html-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/html-app:latest
 
-    # Step 4: Push Docker Image to Amazon ECR
+    # Step 4: Push Docker Image to Amazon eCR
     - name: Push Docker Image to ECR
       run: |
         REPO_NAME="html-app"
