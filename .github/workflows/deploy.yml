@@ -22,7 +22,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
-    # Step 3: Build Docker image
+    # Step 3: Build Docker Image
     - name: Build Docker Image
       run: |
         docker build -t html-app:latest .
