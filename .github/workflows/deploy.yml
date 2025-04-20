@@ -35,7 +35,6 @@ jobs:
         REGION="us-east-1"
         ACCOUNT_ID="${{ secrets.AWS_ACCOUNT_ID }}"
 
-        # Check if ECR repo exists before creating
         if ! aws ecr describe-repositories --repository-names "$REPO_NAME" --region "$REGION" > /dev/null 2>&1; then
           echo "Creating ECR repository: $REPO_NAME"
           aws ecr create-repository --repository-name "$REPO_NAME" --region "$REGION"
@@ -43,7 +42,6 @@ jobs:
           echo "ECR repository $REPO_NAME already exists"
         fi
 
-        # Login and push the image
         aws ecr get-login-password --region "$REGION" | docker login --username AWS --password-stdin "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com"
         docker push "$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO_NAME:latest"
 
@@ -72,7 +70,7 @@ jobs:
           echo "S3 bucket $BUCKET_NAME already exists"
         fi
 
-    # Step 7: Create DynamoDB Lock table (If Not Exists)
+    # Step 7: Create DynamoDB Lock Table (If Not Exists)
     - name: Create DynamoDB Lock Table (If Not Exists)
       run: |
         TABLE_NAME="terraform-locks"
@@ -93,25 +91,33 @@ jobs:
           echo "DynamoDB table $TABLE_NAME already exists"
         fi
 
-    # Step 8: Terraform Init & Apply (Provision EKS)
-    - name: Terraform Init & Apply
+    # Step 8: Terraform Init & Apply (Cluster Only)
+    - name: Terraform Init & Apply (EKS Cluster Only)
       working-directory: ./terraform
       run: |
+        echo 'enable_karpenter = false' > terraform.tfvars
         terraform init
         terraform apply -auto-approve
 
-    # Step 9: Set Up kubectl for EKS
+    # Step 9: Set up kubeconfig for kubectl and Helm
     - name: Set up kubectl
       run: |
         aws eks --region us-east-1 update-kubeconfig --name my-eks-cluster
 
-    # Step 10: Deploy to EKS
+    # Step 10: Enable Karpenter and Reapply Terraform
+    - name: Terraform Apply (Enable Karpenter)
+      working-directory: ./terraform
+      run: |
+        sed -i 's/enable_karpenter = false/enable_karpenter = true/' terraform.tfvars
+        terraform apply -auto-approve
+
+    # Step 11: Deploy app manifests to EKS
     - name: Deploy to EKS
       run: |
         kubectl apply -f k8s/deployment.yml
         kubectl apply -f k8s/service.yml
 
-    # Step 11: Conditionally Apply Karpenter Provisioner
+    # Step 12: Conditionally apply Karpenter Provisioner
     - name: Conditionally Apply Karpenter Provisioner
       run: |
         if helm status karpenter -n karpenter > /dev/null 2>&1; then

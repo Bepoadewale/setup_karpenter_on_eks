@@ -1,5 +1,11 @@
 # terraform/karpenter.tf
 
+variable "enable_karpenter" {
+  description = "Set to true to install Karpenter via Helm"
+  type        = bool
+  default     = false
+}
+
 # IAM role for Karpenter controller
 resource "aws_iam_role" "karpenter_controller" {
   name = "KarpenterControllerRole-${aws_eks_cluster.my_eks.name}"
@@ -18,7 +24,6 @@ resource "aws_iam_role" "karpenter_controller" {
   })
 }
 
-# Attach managed policies required by Karpenter
 resource "aws_iam_role_policy_attachment" "karpenter_node" {
   role       = aws_iam_role.karpenter_controller.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
@@ -56,6 +61,7 @@ provider "helm" {
 }
 
 resource "helm_release" "karpenter" {
+  count      = var.enable_karpenter ? 1 : 0
   name       = "karpenter"
   repository = "https://charts.karpenter.sh"
   chart      = "karpenter"
@@ -81,12 +87,11 @@ resource "helm_release" "karpenter" {
     name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
     value = aws_iam_role.karpenter_controller.arn
   }
-} 
+}
 
-# output for later use if needed
 output "karpenter_role_arn" {
   value = aws_iam_role.karpenter_controller.arn
-} 
+}
 
 output "karpenter_instance_profile" {
   value = aws_iam_instance_profile.karpenter_instance_profile.name
