@@ -110,4 +110,13 @@ jobs:
       run: |
         kubectl apply -f k8s/deployment.yml
         kubectl apply -f k8s/service.yml
-        aws eks --region us-east-1 update-kubeconfig --name my-eks-cluster
+
+    # Step 11: Conditionally Apply Karpenter Provisioner
+    - name: Conditionally Apply Karpenter Provisioner
+      run: |
+        if helm status karpenter -n karpenter > /dev/null 2>&1; then
+          echo "Karpenter Helm release is present. Applying provisioner..."
+          kubectl apply -f k8s/karpenter-provisioner.yaml
+        else
+          echo "Karpenter Helm release not found. Skipping provisioner."
+        fi
