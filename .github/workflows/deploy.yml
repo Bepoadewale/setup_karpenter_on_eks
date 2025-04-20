@@ -115,7 +115,7 @@ jobs:
         cat terraform.tfvars
         terraform apply -auto-approve
 
-    # Step 11: Deploy app manifests to EKS
+    # Step 11: Deploy manifests to EKS
     - name: Deploy to EKS
       run: |
         kubectl apply -f k8s/deployment.yml
