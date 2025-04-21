@@ -121,7 +121,7 @@ jobs:
         kubectl apply -f k8s/deployment.yml
         kubectl apply -f k8s/service.yml
 
-    # Step 12: Conditionally apply Karpenter Provisioner
+    # Step 12: Conditionally apply Karpenter provisioner
     - name: Conditionally Apply Karpenter Provisioner
       run: |
         if helm status karpenter -n karpenter > /dev/null 2>&1; then
