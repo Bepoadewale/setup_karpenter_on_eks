@@ -10,9 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Step 1: Checkout Code
+    # Step 1: Checkout Code (fetch full history)
     - name: Checkout Code
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
     # Step 2: Set up AWS CLI
     - name: Configure AWS Credentials
@@ -131,7 +133,7 @@ jobs:
           echo "Karpenter Helm release not found. Skipping provisioner."
         fi
 
-    # Step 13: Rollback if deployment fails
+    # Step 13: Rollback to Stable Commit (Create rollback branch automatically)
     - name: Rollback to Stable Commit
       if: failure()
       run: |
@@ -139,5 +141,7 @@ jobs:
         git config --global user.email "bepoadewale@yahoo.com"
         git config --global user.name "bepoadewale"
         git fetch origin
-        git reset --hard 4b3fec3  # <-- Replace with your stable commit hash
-        git push --force
+        ROLLBACK_BRANCH="rollback-$(date +'%Y%m%d-%H%M%S')"
+        git checkout -b "$ROLLBACK_BRANCH" 4b3fec3   # <-- Replace with YOUR stable commit hash
+        git push origin "$ROLLBACK_BRANCH"
+        echo "✅ Rollback branch '$ROLLBACK_BRANCH' created and pushed."
