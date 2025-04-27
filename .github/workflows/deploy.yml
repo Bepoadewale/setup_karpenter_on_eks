@@ -28,7 +28,7 @@ jobs:
         docker build -t html-app:latest .
         docker tag html-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/html-app:latest
 
-    # Step 4: Push Docker Image to Amazon eCR
+    # Step 4: Push Docker Image to Amazon ECR
     - name: Push Docker Image to ECR
       run: |
         REPO_NAME="html-app"
@@ -102,7 +102,7 @@ jobs:
         terraform apply -auto-approve
 
     # Step 9: Set up kubeconfig for kubectl and Helm
-    - name: Set up kubectl
+    - name: Set up kubeconfig
       run: |
         aws eks --region us-east-1 update-kubeconfig --name my-eks-cluster
 
@@ -130,3 +130,14 @@ jobs:
         else
           echo "Karpenter Helm release not found. Skipping provisioner."
         fi
+
+    # Step 13: Rollback if deployment fails
+    - name: Rollback to Stable Commit
+      if: failure()
+      run: |
+        echo "🚨 Deployment failed. Starting rollback..."
+        git config --global user.email "bepoadewale@yahoo.com"
+        git config --global user.name "bepoadewale"
+        git fetch origin
+        git reset --hard 4b3fec3  # <-- Replace with your stable commit hash
+        git push --force
